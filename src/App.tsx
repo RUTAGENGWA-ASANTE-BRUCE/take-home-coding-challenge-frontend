@@ -1,4 +1,4 @@
-import * as React from "react"
+import React,{useEffect,useState} from "react"
 import {
   ChakraProvider,
   Box,
@@ -7,32 +7,105 @@ import {
   VStack,
   Code,
   Grid,
-  theme,
+  // theme,
 } from "@chakra-ui/react"
 import { ColorModeSwitcher } from "./ColorModeSwitcher"
 import { Logo } from "./Logo"
+import { extendTheme } from '@chakra-ui/react'
+import StockItem from './components/StockItem'
+let openPrice = "";
+let currentPrice = "";
+let color = "";
+interface book{
+  symbol: string,
+  color: string,
+  curr: string
+} 
 
-export const App = () => (
+
+
+// 2. Extend the theme with new layer styles
+const theme = extendTheme({
+  layerStyles: {
+    base: {
+      bg: 'gray.50',
+      border: '2px solid',
+      borderColor: 'gray.500',
+      marginTop:'10px'
+    },
+    selected: {
+      bg: 'teal.500',
+      color: 'teal.700',
+      borderColor: 'orange.500',
+    },
+  },
+})
+
+export const App = () => {
+  const [stockDisplayed,setStockDisplyed]=useState<Boolean>(false);
+  const [list,setList]=useState<book[]>([]);
+  const [currentDisplay,setCurrentDisplay]=useState<string>("")
+  const [stock,setStock]=useState<string>("")
+  const handleChange = (event :React.ChangeEvent<HTMLInputElement>) => {
+    setCurrentDisplay(event.target.value );
+  };
+
+  const displayInfo = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    setStock("APPL")
+    var newStock:book={
+      symbol: "APPL",
+      color: "green",
+      curr: "3113131"
+    }
+    var newList=list
+    newList.push(newStock);
+      setList(newList);
+    }
+  const determinePrice = () => {
+    if (currentPrice >= openPrice) {
+      color = "green";
+    } else {
+      color = "red";
+    }
+  };
+  const clearList = () => {
+    setList([]);
+  };
+
+  // useEffect(() => {
+    
+  // })
+  return(
   <ChakraProvider theme={theme}>
-    <Box textAlign="center" fontSize="xl">
-      <Grid minH="100vh" p={3}>
-        <ColorModeSwitcher justifySelf="flex-end" />
-        <VStack spacing={8}>
-          <Logo h="40vmin" pointerEvents="none" />
-          <Text>
-            Edit <Code fontSize="xl">src/App.tsx</Code> and save to reload.
-          </Text>
-          <Link
-            color="teal.500"
-            href="https://chakra-ui.com"
-            fontSize="2xl"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn Chakra
-          </Link>
-        </VStack>
-      </Grid>
-    </Box>
-  </ChakraProvider>
-)
+   <div className="App">
+        <Box >Stock Displayer</Box>
+        <h2>Enter Stocks Below (Use Symbol):</h2>
+        <form>
+          <label>
+            <input
+              type="text"
+              name="name"
+              value={currentDisplay}
+              onChange={handleChange}
+              className=""
+            />
+          </label>
+          <button onClick={displayInfo}>Submit</button>
+          <button onClick={clearList}>Clear</button>
+        </form>
+        <p style={{ color: color }}>
+          {stockDisplayed &&
+            currentDisplay + " Current Price: $" + stock}
+        </p>
+        <ul>
+          {list.map((item) => (
+            <StockItem
+              book={item}
+            />
+          ))}
+        </ul>
+        {stockDisplayed && <button>Refresh</button>}
+      </div>
+  </ChakraProvider>)
+}
