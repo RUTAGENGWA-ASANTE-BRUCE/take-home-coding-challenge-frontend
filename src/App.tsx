@@ -53,11 +53,7 @@ export const App = () => {
   const displayInfo = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     setStock("APPL")
-    var newStock:book={
-      symbol: "APPL",
-      color: "green",
-      curr: "3113131"
-    }
+    let newStock:book=fetch(`http://localhost:8081/api/v1/getStock?stockSymbol=${currentDisplay}`,).then(res=>res.json()).then(res=>res.data)
     var newList=list
     newList.push(newStock);
       setList(newList);
